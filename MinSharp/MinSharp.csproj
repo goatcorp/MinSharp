@@ -25,8 +25,15 @@
     <None Include="../LICENSE.txt" Pack="true" PackagePath="" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
   <ItemGroup>
-    <None Update="runtimes\**" CopyToOutputDirectory="PreserveNewest" Pack="True" />
+    <None Update="runtimes\**" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="runtimes\**" PackagePath="runtimes" Visible="false" />
   </ItemGroup>
 
 </Project>

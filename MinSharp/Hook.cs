@@ -3,16 +3,32 @@ using System.Runtime.InteropServices;
 
 namespace MinSharp
 {
-    public unsafe class Hook<T> : IDisposable
+    /// <summary>
+    /// Container class for MinHook hooks.
+    /// </summary>
+    /// <typeparam name="T">Delegate function for this hook.</typeparam>
+    public unsafe class Hook<T> : IDisposable where T : Delegate
     {
+        /// <summary>
+        /// Gets a value indicating whether or not this hook is enabled.
+        /// </summary>
         public bool Enabled { get; private set; }
 
+        /// <summary>
+        /// Gets a delegate with which the original function can be called.
+        /// </summary>
         public T Original { get; private set; }
 
         private readonly IntPtr targetFunctionPtr;
         private readonly IntPtr detourFunctionPtr;
         private readonly IntPtr originalFunctionPtr;
 
+        /// <summary>
+        /// Create a new hook, but do not enable it.
+        /// </summary>
+        /// <param name="address">The address of the target function.</param>
+        /// <param name="detour">The detour function.</param>
+        /// <exception cref="MinHookException">Exception that may occurr when hooking has failed.</exception>
         public Hook(IntPtr address, T detour)
         {
             if (!Glue.Initialized)
@@ -37,6 +53,9 @@ namespace MinSharp
             }
         }
 
+        /// <summary>
+        /// Enable this hook.
+        /// </summary>
         public void Enable()
         {
             var status = Glue.EnableHook(this.targetFunctionPtr);
@@ -47,6 +66,9 @@ namespace MinSharp
             Enabled = true;
         }
 
+        /// <summary>
+        /// Disable this hook.
+        /// </summary>
         public void Disable()
         {
             var status = Glue.DisableHook(this.targetFunctionPtr);
@@ -57,6 +79,9 @@ namespace MinSharp
             Enabled = false;
         }
 
+        /// <summary>
+        /// Remove this hook.
+        /// </summary>
         private void Remove()
         {
             var status = Glue.RemoveHook(this.targetFunctionPtr);
@@ -67,11 +92,9 @@ namespace MinSharp
             Enabled = false;
         }
 
-        private void ReleaseUnmanagedResources()
-        {
-            // TODO release unmanaged resources here
-        }
-
+        /// <summary>
+        /// Disable and remove this hook, and, in case no hooks are left, uninitialize MinHook.
+        /// </summary>
         public void Dispose()
         {
             Disable();
@@ -85,13 +108,7 @@ namespace MinSharp
                 Glue.Initialized = false;
             }
 
-            ReleaseUnmanagedResources();
             GC.SuppressFinalize(this);
-        }
-
-        ~Hook()
-        {
-            ReleaseUnmanagedResources();
         }
     }
 }

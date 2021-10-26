@@ -22,7 +22,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-=-=-=-=-=-=- MINHOOK LICENSE =-=-=-=-=-=-
+=-=-=-=-=-=- MINHOOK LICENSE -=-=-=-=-=-=
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 ﻿MinHook - The Minimalistic API Hooking Library for x64/x86

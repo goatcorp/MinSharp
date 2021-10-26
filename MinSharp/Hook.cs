@@ -58,6 +58,9 @@ namespace MinSharp
         /// </summary>
         public void Enable()
         {
+            if (Enabled)
+                return;
+
             var status = Glue.EnableHook(this.targetFunctionPtr);
 
             if (status != MhStatus.MH_OK)
@@ -71,6 +74,9 @@ namespace MinSharp
         /// </summary>
         public void Disable()
         {
+            if (!Enabled)
+                return;
+
             var status = Glue.DisableHook(this.targetFunctionPtr);
 
             if (status != MhStatus.MH_OK)

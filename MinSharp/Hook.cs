@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace MinSharp
 {
@@ -27,11 +25,7 @@ namespace MinSharp
 
             fixed (IntPtr* pOriginalFunctionPtr = &this.originalFunctionPtr)
             {
-                Glue.MessageBox(IntPtr.Zero, $"Now hooking {address:X}", "mh", 0);
-
                 var status = Glue.CreateHook(address, this.detourFunctionPtr, pOriginalFunctionPtr);
-
-                Glue.MessageBox(IntPtr.Zero, $"Done! {status}", "mh", 0);
 
                 if (status != MhStatus.MH_OK)
                     throw new MinHookException(status);

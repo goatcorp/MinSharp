@@ -7,8 +7,47 @@ namespace MinSharp
     /// Container class for MinHook hooks.
     /// </summary>
     /// <typeparam name="T">Delegate function for this hook.</typeparam>
-    public unsafe class Hook<T> : IDisposable where T : Delegate
+    public unsafe class Hook<T> : IDisposable
+        where T : Delegate
     {
+        private readonly IntPtr targetFunctionPtr;
+        private readonly IntPtr detourFunctionPtr;
+        private readonly IntPtr originalFunctionPtr;
+        private readonly ulong hookIdent;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Hook{T}"/> class.
+        /// Create a new hook, but do not enable it.
+        /// </summary>
+        /// <param name="address">The address of the target function.</param>
+        /// <param name="detour">The detour function.</param>
+        /// <param name="hookIdent">When hooking a previously hooked method, a hook index is required.</param>
+        /// <exception cref="MinHookException">Exception that may occurr when hooking has failed.</exception>
+        public Hook(IntPtr address, T detour, ulong hookIdent = 0)
+        {
+            if (!Glue.Initialized)
+                Glue.Initialize();
+
+            Glue.Initialized = true;
+
+            this.detourFunctionPtr = Marshal.GetFunctionPointerForDelegate(detour);
+            this.targetFunctionPtr = address;
+            this.hookIdent = hookIdent;
+
+            fixed (IntPtr* pOriginalFunctionPtr = &this.originalFunctionPtr)
+            {
+                var status = Glue.CreateHookEx(this.hookIdent, this.targetFunctionPtr, this.detourFunctionPtr, pOriginalFunctionPtr);
+
+                if (status != MhStatus.MH_OK)
+                    throw new MinHookException(status);
+
+                this.Original = Marshal.GetDelegateForFunctionPointer<T>(*pOriginalFunctionPtr);
+                this.Enabled = false;
+
+                Glue.NumHooks++;
+            }
+        }
+
         /// <summary>
         /// Gets a value indicating whether or not this hook is enabled.
         /// </summary>
@@ -19,54 +58,20 @@ namespace MinSharp
         /// </summary>
         public T Original { get; private set; }
 
-        private readonly IntPtr targetFunctionPtr;
-        private readonly IntPtr detourFunctionPtr;
-        private readonly IntPtr originalFunctionPtr;
-
-        /// <summary>
-        /// Create a new hook, but do not enable it.
-        /// </summary>
-        /// <param name="address">The address of the target function.</param>
-        /// <param name="detour">The detour function.</param>
-        /// <exception cref="MinHookException">Exception that may occurr when hooking has failed.</exception>
-        public Hook(IntPtr address, T detour)
-        {
-            if (!Glue.Initialized)
-                Glue.Initialize();
-
-            Glue.Initialized = true;
-
-            this.detourFunctionPtr = Marshal.GetFunctionPointerForDelegate(detour);
-            this.targetFunctionPtr = address;
-
-            fixed (IntPtr* pOriginalFunctionPtr = &this.originalFunctionPtr)
-            {
-                var status = Glue.CreateHook(address, this.detourFunctionPtr, pOriginalFunctionPtr);
-
-                if (status != MhStatus.MH_OK)
-                    throw new MinHookException(status);
-
-                Original = Marshal.GetDelegateForFunctionPointer<T>(*pOriginalFunctionPtr);
-                Enabled = false;
-
-                Glue.NumHooks++;
-            }
-        }
-
         /// <summary>
         /// Enable this hook.
         /// </summary>
         public void Enable()
         {
-            if (Enabled)
+            if (this.Enabled)
                 return;
 
-            var status = Glue.EnableHook(this.targetFunctionPtr);
+            var status = Glue.EnableHookEx(this.hookIdent, this.targetFunctionPtr);
 
             if (status != MhStatus.MH_OK)
                 throw new MinHookException(status);
 
-            Enabled = true;
+            this.Enabled = true;
         }
 
         /// <summary>
@@ -74,15 +79,15 @@ namespace MinSharp
         /// </summary>
         public void Disable()
         {
-            if (!Enabled)
+            if (!this.Enabled)
                 return;
 
-            var status = Glue.DisableHook(this.targetFunctionPtr);
+            var status = Glue.DisableHookEx(this.hookIdent, this.targetFunctionPtr);
 
             if (status != MhStatus.MH_OK)
                 throw new MinHookException(status);
 
-            Enabled = false;
+            this.Enabled = false;
         }
 
         /// <summary>
@@ -90,12 +95,12 @@ namespace MinSharp
         /// </summary>
         private void Remove()
         {
-            var status = Glue.RemoveHook(this.targetFunctionPtr);
+            var status = Glue.RemoveHookEx(this.hookIdent, this.targetFunctionPtr);
 
             if (status != MhStatus.MH_OK)
                 throw new MinHookException(status);
 
-            Enabled = false;
+            this.Enabled = false;
         }
 
         /// <summary>
@@ -103,8 +108,8 @@ namespace MinSharp
         /// </summary>
         public void Dispose()
         {
-            Disable();
-            Remove();
+            this.Disable();
+            this.Remove();
 
             Glue.NumHooks--;
 

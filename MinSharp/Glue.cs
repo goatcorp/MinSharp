@@ -56,8 +56,5 @@ namespace MinSharp
 
         [DllImport("minhook.x64d", CallingConvention = CallingConvention.StdCall, EntryPoint = "MH_StatusToString")]
         public static extern IntPtr StatusToString(MhStatus status);
-
-        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-        public static extern int MessageBox(IntPtr hWnd, string text, string caption, uint type);
     }
 }

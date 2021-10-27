@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 
 namespace MinSharp
@@ -16,7 +16,7 @@ namespace MinSharp
         public static extern MhStatus Uninitialize();
 
         [DllImport("minhook.x64d", CallingConvention = CallingConvention.StdCall, EntryPoint = "MH_CreateHook")]
-        public static extern MhStatus CreateHook(IntPtr pTarget, IntPtr pDetour, IntPtr *ppOriginal);
+        public static extern MhStatus CreateHook(IntPtr pTarget, IntPtr pDetour, IntPtr* ppOriginal);
 
         [DllImport("minhook.x64d", CallingConvention = CallingConvention.StdCall, EntryPoint = "MH_RemoveHook")]
         public static extern MhStatus RemoveHook(IntPtr pTarget);
@@ -34,12 +34,12 @@ namespace MinSharp
         public static extern MhStatus QueueDisableHook(IntPtr pTarget);
 
         [DllImport("minhook.x64d", CallingConvention = CallingConvention.StdCall, EntryPoint = "MH_ApplyQueued")]
-        public static extern MhStatus ApplyQueued(IntPtr pTarget);
+        public static extern MhStatus ApplyQueued();
 
         [DllImport("minhook.x64d", CallingConvention = CallingConvention.StdCall, EntryPoint = "MH_StatusToString")]
         public static extern IntPtr StatusToString(MhStatus status);
 
-        [DllImport("user32.dll", SetLastError = true, CharSet= CharSet.Auto)]
-        public static extern int MessageBox(IntPtr hWnd, String text, String caption, uint type);
+        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        public static extern int MessageBox(IntPtr hWnd, string text, string caption, uint type);
     }
 }

@@ -13,6 +13,7 @@ namespace MinSharp
         private readonly IntPtr targetFunctionPtr;
         private readonly IntPtr detourFunctionPtr;
         private readonly IntPtr originalFunctionPtr;
+        private readonly T originalDelegate;
         private readonly ulong hookIdent;
 
         /// <summary>
@@ -41,7 +42,7 @@ namespace MinSharp
                 if (status != MhStatus.MH_OK)
                     throw new MinHookException(status);
 
-                this.Original = Marshal.GetDelegateForFunctionPointer<T>(*pOriginalFunctionPtr);
+                this.originalDelegate = Marshal.GetDelegateForFunctionPointer<T>(*pOriginalFunctionPtr);
                 this.Enabled = false;
 
                 Glue.NumHooks++;
@@ -56,7 +57,16 @@ namespace MinSharp
         /// <summary>
         /// Gets a delegate with which the original function can be called.
         /// </summary>
-        public T Original { get; private set; }
+        public T Original
+        {
+            get
+            {
+                if (!Enabled)
+                    throw new InvalidOperationException("Original cannot be called when the hook is disabled.");
+
+                return this.originalDelegate;
+            }
+        }
 
         /// <summary>
         /// Enable this hook.

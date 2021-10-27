@@ -23,14 +23,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="../LICENSE.txt" Pack="true" PackagePath="" />
-    <None Include="../README.md" Pack="true" PackagePath="" />
+    <None Include="../LICENSE.txt" Pack="true" PackagePath="\" />
+    <None Include="../README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <PropertyGroup>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+    <!-- BUG: Cannot include symbols and a readme, fixed with .NET 6(https://github.com/NuGet/Home/issues/11292) -->
+    <!-- <SymbolPackageFormat>snupkg</SymbolPackageFormat> -->
   </PropertyGroup>
 
   <ItemGroup>

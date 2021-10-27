@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 
 namespace MinSharp
@@ -13,6 +13,7 @@ namespace MinSharp
         private readonly IntPtr targetFunctionPtr;
         private readonly IntPtr detourFunctionPtr;
         private readonly IntPtr originalFunctionPtr;
+        private readonly ulong hookIdent;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Hook{T}"/> class.
@@ -20,8 +21,9 @@ namespace MinSharp
         /// </summary>
         /// <param name="address">The address of the target function.</param>
         /// <param name="detour">The detour function.</param>
+        /// <param name="hookIdent">When hooking a previously hooked method, a hook index is required.</param>
         /// <exception cref="MinHookException">Exception that may occurr when hooking has failed.</exception>
-        public Hook(IntPtr address, T detour)
+        public Hook(IntPtr address, T detour, ulong hookIdent = 0)
         {
             if (!Glue.Initialized)
                 Glue.Initialize();
@@ -30,10 +32,11 @@ namespace MinSharp
 
             this.detourFunctionPtr = Marshal.GetFunctionPointerForDelegate(detour);
             this.targetFunctionPtr = address;
+            this.hookIdent = hookIdent;
 
             fixed (IntPtr* pOriginalFunctionPtr = &this.originalFunctionPtr)
             {
-                var status = Glue.CreateHook(address, this.detourFunctionPtr, pOriginalFunctionPtr);
+                var status = Glue.CreateHookEx(this.hookIdent, this.targetFunctionPtr, this.detourFunctionPtr, pOriginalFunctionPtr);
 
                 if (status != MhStatus.MH_OK)
                     throw new MinHookException(status);
@@ -63,7 +66,7 @@ namespace MinSharp
             if (this.Enabled)
                 return;
 
-            var status = Glue.EnableHook(this.targetFunctionPtr);
+            var status = Glue.EnableHookEx(this.hookIdent, this.targetFunctionPtr);
 
             if (status != MhStatus.MH_OK)
                 throw new MinHookException(status);
@@ -79,7 +82,7 @@ namespace MinSharp
             if (!this.Enabled)
                 return;
 
-            var status = Glue.DisableHook(this.targetFunctionPtr);
+            var status = Glue.DisableHookEx(this.hookIdent, this.targetFunctionPtr);
 
             if (status != MhStatus.MH_OK)
                 throw new MinHookException(status);
@@ -92,7 +95,7 @@ namespace MinSharp
         /// </summary>
         private void Remove()
         {
-            var status = Glue.RemoveHook(this.targetFunctionPtr);
+            var status = Glue.RemoveHookEx(this.hookIdent, this.targetFunctionPtr);
 
             if (status != MhStatus.MH_OK)
                 throw new MinHookException(status);

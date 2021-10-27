@@ -1,4 +1,4 @@
-namespace MinSharp
+﻿namespace MinSharp
 {
     /// <summary>
     /// Error codes returned by MinHook.
@@ -76,5 +76,10 @@ namespace MinSharp
         /// The specified function is not found.
         /// </summary>
         MH_ERROR_FUNCTION_NOT_FOUND,
+
+        /// <summary>
+        /// The synchronization mutex object failed.
+        /// </summary>
+        MH_ERROR_MUTEX_FAILURE,
     }
 }

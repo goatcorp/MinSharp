@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.1</TargetFramework>
 
     <PackageId>MinSharp</PackageId>
-    <PackageVersion>1.0.2</PackageVersion>
+    <PackageVersion>1.0.3</PackageVersion>
     <FileVersion>1.0.0</FileVersion>
 
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>

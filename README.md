@@ -1,4 +1,4 @@
-# MinSharp ![Nuget](https://img.shields.io/nuget/v/MinSharp)
+# MinSharp [![Nuget](https://img.shields.io/nuget/v/MinSharp)](https://www.nuget.org/packages/MinSharp/)
 Minimalistic .NET API wrapper for the minimalistic x86/x64 API Hooking Library for Windows by TsudaKageyu.
 
 ### Example
